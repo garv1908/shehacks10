@@ -1,10 +1,10 @@
+import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Text, Paragraph } from 'react-native-paper';
+import { Button, Paragraph, Text } from 'react-native-paper';
 import { useAuth } from '../providers/AuthProvider';
-import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
 import { upsertProfileForAuthUser } from '../services/profileService';
 
 export default function Home() {

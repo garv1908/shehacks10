@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import * as Notifications from 'expo-notifications';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import useLocationUpdater from '../hooks/useLocationUpdater';
 import usePushToken from '../hooks/usePushToken';
 import { getProfileByAuthId, upsertProfileForAuthUser } from '../services/profileService';

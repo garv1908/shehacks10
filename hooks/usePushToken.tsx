@@ -1,5 +1,5 @@
-import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { upsertProfileForAuthUser } from '../services/profileService';
