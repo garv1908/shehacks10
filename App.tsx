@@ -1,7 +1,8 @@
-import { Stack } from 'expo-router';
+
+import { ExpoRoot } from 'expo-router';
 import React from 'react';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-import { AuthProvider } from '../providers/AuthProvider';
+import { AuthProvider } from './providers/AuthProvider';
 
 const theme = {
   ...DefaultTheme,
@@ -15,11 +16,11 @@ const theme = {
   },
 };
 
-export default function Layout() {
+export default function App(props: any) {
   return (
     <PaperProvider theme={theme}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <ExpoRoot {...props} />
       </AuthProvider>
     </PaperProvider>
   );
