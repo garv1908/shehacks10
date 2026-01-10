@@ -28,8 +28,10 @@ export default function useLocationUpdater(user: any) {
             if (now - last < FIVE_MIN) return;
             lastUpdateRef.current = now;
             try {
-              console.log('[locationWatcher] updating last_seen for user.id=', user?.id);
-              await updateProfileIfExists(user, { last_seen: new Date().toISOString() });
+              const { latitude, longitude } = loc.coords;
+              console.log('[locationWatcher] updating last_seen for user.id=', user?.id, { latitude, longitude });
+              const point = `POINT(${longitude} ${latitude})`;
+              await updateProfileIfExists(user, { last_seen: new Date().toISOString(), location: point });
             } catch (err) {
               console.warn('failed to update last_seen', err);
             }

@@ -48,7 +48,8 @@ export default function Home() {
               setPingStatus('Updating profile (if exists)');
               const { updateProfileIfExists } = await import('../services/profileService');
               console.log('[app] updating last_seen for user.id=', user?.id);
-              const res = await updateProfileIfExists(user, { last_seen: new Date().toISOString() } as any);
+              const point = `POINT(${longitude} ${latitude})`;
+              const res = await updateProfileIfExists(user, { last_seen: new Date().toISOString(), location: point } as any);
               console.log('[app] update last_seen result=', res);
               setPingStatus(res ? 'Profile updated' : 'Profile did not exist; no update performed');
             } catch (err: any) {

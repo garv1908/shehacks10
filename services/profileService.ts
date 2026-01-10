@@ -4,6 +4,7 @@ type ProfilePatch = {
   name?: string | null;
   interests?: string[] | null;
   meeting_places?: string[] | null;
+  location?: string | null;
   expo_push_token?: string | null;
   last_seen?: string | null | Date;
   needs_onboarding?: boolean | null;
@@ -31,6 +32,9 @@ export async function upsertProfileForAuthUser(authUser: any, patch: ProfilePatc
 
   if ('meeting_places' in patch) payload.meeting_places = patch.meeting_places ?? null;
   else if (existing?.meeting_places) payload.meeting_places = existing.meeting_places;
+
+  if ('location' in patch) payload.location = patch.location ?? null;
+  else if (existing?.location) payload.location = existing.location;
 
   if ('expo_push_token' in patch) payload.expo_push_token = patch.expo_push_token ?? null;
   else if (existing?.expo_push_token) payload.expo_push_token = existing.expo_push_token;
@@ -70,6 +74,7 @@ export async function updateProfileIfExists(authUser: any, patch: ProfilePatch) 
   if ('expo_push_token' in patch) updates.expo_push_token = patch.expo_push_token ?? null;
   if ('last_seen' in patch) updates.last_seen = patch.last_seen instanceof Date ? patch.last_seen.toISOString() : patch.last_seen ?? null;
   if ('needs_onboarding' in patch) updates.needs_onboarding = patch.needs_onboarding ?? null;
+  if ('location' in patch) updates.location = patch.location ?? null;
 
   if (Object.keys(updates).length === 0) return null;
 
