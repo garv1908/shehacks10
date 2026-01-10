@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import * as Notifications from 'expo-notifications';
 import useLocationUpdater from '../hooks/useLocationUpdater';
 import usePushToken from '../hooks/usePushToken';
 import { getProfileByAuthId, upsertProfileForAuthUser } from '../services/profileService';
@@ -14,6 +15,8 @@ interface AuthContextProps {
   updateUser: (patch: Partial<any>) => void;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  latestNotification?: any | null;
+  clearNotification?: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -22,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [latestNotification, setLatestNotification] = useState<any | null>(null);
 
   const login = (user: any) => {
     setIsLoggedIn(true);
@@ -109,13 +113,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Notification listeners for in-app notifications (local notifications)
+  useEffect(() => {
+    const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
+      setLatestNotification(notification);
+    });
+    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      setLatestNotification(response.notification ?? null);
+    });
+
+    return () => {
+      receivedListener.remove();
+      responseListener.remove();
+    };
+  }, []);
+
   // wire push token and location updater hooks (they internally early-return if no user)
   usePushToken(user);
   useLocationUpdater(user);
 
+  const clearNotification = () => setLatestNotification(null);
+
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, needsOnboarding, user, login, logout, completeOnboarding, updateUser, signUp, signIn }}>
+      value={{ isLoggedIn, needsOnboarding, user, login, logout, completeOnboarding, updateUser, signUp, signIn, latestNotification, clearNotification }}>
       {children}
     </AuthContext.Provider>
   );

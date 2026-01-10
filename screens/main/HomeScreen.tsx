@@ -8,6 +8,7 @@ import { upsertProfileForAuthUser } from '../../services/profileService';
 
 export default function HomeScreen() {
   const { user, login } = useAuth();
+  const { latestNotification, clearNotification } = useAuth();
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,9 +22,11 @@ export default function HomeScreen() {
       const { latitude, longitude } = pos.coords;
       setLocation({ latitude, longitude });
 
-      // Persist last_seen to profile (best-effort)
+      // Persist last_seen to profile only if profile exists (avoid creating incomplete rows)
       try {
-        await upsertProfileForAuthUser(user, { last_seen: new Date().toISOString() });
+        const { updateProfileIfExists } = await import('../../services/profileService');
+        const updated = await updateProfileIfExists(user, { last_seen: new Date().toISOString() } as any);
+        console.log('[home] updateProfileIfExists result=', updated);
       } catch (err) {
         console.warn('failed to persist last_seen', err);
       }
@@ -63,6 +66,18 @@ export default function HomeScreen() {
         <Card.Content>
           <Paragraph>Use the buttons below to test location, onboarding, and notifications.</Paragraph>
           <View style={{ height: 12 }} />
+          {latestNotification ? (
+            <Card style={{ marginBottom: 12 }}>
+              <Card.Content>
+                <Text variant="titleMedium">In-app Notification</Text>
+                <Paragraph>{latestNotification.request?.content?.title ?? 'Notification'}</Paragraph>
+                <Paragraph>{latestNotification.request?.content?.body ?? ''}</Paragraph>
+              </Card.Content>
+              <Card.Actions>
+                <Button onPress={() => clearNotification?.()}>Dismiss</Button>
+              </Card.Actions>
+            </Card>
+          ) : null}
           <Text>Location:</Text>
           <Paragraph>{location ? `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}` : 'No ping yet'}</Paragraph>
         </Card.Content>

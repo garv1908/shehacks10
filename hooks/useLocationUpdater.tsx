@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 import { useEffect, useRef } from 'react';
-import { upsertProfileForAuthUser } from '../services/profileService';
+import { updateProfileIfExists } from '../services/profileService';
 
 // Updates `last_seen` in profile periodically while app is foregrounded.
 export default function useLocationUpdater(user: any) {
@@ -28,7 +28,8 @@ export default function useLocationUpdater(user: any) {
             if (now - last < FIVE_MIN) return;
             lastUpdateRef.current = now;
             try {
-              await upsertProfileForAuthUser(user, { last_seen: new Date().toISOString() });
+              console.log('[locationWatcher] updating last_seen for user.id=', user?.id);
+              await updateProfileIfExists(user, { last_seen: new Date().toISOString() });
             } catch (err) {
               console.warn('failed to update last_seen', err);
             }
