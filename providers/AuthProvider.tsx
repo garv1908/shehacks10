@@ -4,6 +4,7 @@ import useLocationUpdater from '../hooks/useLocationUpdater';
 import usePushToken from '../hooks/usePushToken';
 import { getProfileByAuthId, upsertProfileForAuthUser } from '../services/profileService';
 import { supabase } from '../supabaseClient';
+import React from 'react';
 
 interface AuthContextProps {
   isLoggedIn: boolean;
