@@ -46,7 +46,7 @@ export default function MainScreen() {
         },
         (payload) => {
           console.log("New notification for user ", currentUserId, payload);
-          router.push({ pathname: '/MatchScreen', params: { data: JSON.stringify(payload.new.payload) } });
+          router.push({ pathname: '/match-screen', params: { data: JSON.stringify(payload.new.payload) } });
         }
       )
       .subscribe();

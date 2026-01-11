@@ -56,8 +56,8 @@ export default function MatchScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {/* Header Section */}
             <View style={styles.header}>
-                <ThemedText style={styles.emoji}>✨💕✨</ThemedText>
-                <ThemedText style={styles.matchTitle}>It's a Match!</ThemedText>
+                <ThemedText style={styles.emoji}>✨🤝✨</ThemedText>
+                <ThemedText style={styles.matchTitle}>it's a Match!</ThemedText>
                 <ThemedText style={styles.subtitle}>You found someone with great taste.</ThemedText>
             </View>
 
@@ -70,11 +70,9 @@ export default function MatchScreen() {
                         <ThemedText style={styles.placeName}>{nearest_place.name}</ThemedText>
                         <ThemedText style={styles.address}>{nearest_place.address}</ThemedText>
                     </View>
-                    <View style={styles.chipRow}>
-                                  <View key={distance} style={styles.chip}>
-                                    <ThemedText>{distance.label}</ThemedText>
-                                    <ThemedText>{distance.time} minute away</ThemedText>
-                                    </View>
+                    <View style={styles.distanceContainer}>
+                      <ThemedText style={styles.distanceLabel}>📍 {distance.label}</ThemedText>
+                      <ThemedText style={styles.distanceTime}>{distance.time} min walk</ThemedText>
                     </View>
 
                     <View style={styles.divider} />
@@ -134,6 +132,7 @@ const styles = StyleSheet.create({
   emoji: {
     fontSize: 48,
     marginBottom: 8,
+    lineHeight: 56,
   },
   matchTitle: {
     fontFamily: Fonts.serif, // Outfit
@@ -142,6 +141,7 @@ const styles = StyleSheet.create({
     color: Colors.light.tint,
     marginBottom: 8,
     textAlign: 'center',
+    lineHeight: 52,
   },
   subtitle: {
     fontFamily: Fonts.sans,
@@ -252,5 +252,26 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     width: '100%',
+  },
+  distanceContainer: {
+    backgroundColor: Colors.light.elevation,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  distanceLabel: {
+    fontFamily: Fonts.sans,
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.light.tint,
+    marginBottom: 4,
+  },
+  distanceTime: {
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: Colors.light.text,
+    opacity: 0.7,
   },
 });
