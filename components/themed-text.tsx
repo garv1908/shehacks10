@@ -44,9 +44,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 32,
+    fontSize: 50,
+    fontFamily: 'ImperialScript-Regular',
+    lineHeight: 60,
+    // fontWeight: 'bold', // ImperialScript is a script font, so weight is not needed
   },
   subtitle: {
     fontSize: 20,

@@ -3,14 +3,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AppButton } from '@/components/ui/app-button';
 import { checkNearby } from '@/services/checkNearbyService';
-import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
-import { Provider as PaperProvider } from 'react-native-paper';
-import { useAuth } from '../providers/AuthProvider';
 import { supabase } from '@/supabaseClient';
+import * as Location from 'expo-location';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { useAuth } from '../providers/AuthProvider';
 
 
 export default function MainScreen() {
@@ -26,7 +24,7 @@ export default function MainScreen() {
   useEffect(() => {
     console.log("in use effect")
     if (!user) {
-      console.error("NotificationListener: No user in MainScreen useEffect");
+      console.warn("NotificationListener: No user in MainScreen useEffect");
       return;
     };
     const currentUserId = user.id;
@@ -62,10 +60,9 @@ export default function MainScreen() {
 
 
   return (
-    <PaperProvider>
-      <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.welcome}>Welcome{user?.name ? `, ${user.name}` : ''}!</ThemedText>
-        <ThemedText style={styles.sub}>Ready to meet someone new?</ThemedText>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">Welcome{user?.name ? `, ${user.name}` : ''}!</ThemedText>
+      <ThemedText style={styles.sub}>Ready to meet someone new?</ThemedText>
         {!user ? (
           <AppButton onPress={() => router.push('/login')}>
             Login / Signup
@@ -127,9 +124,9 @@ export default function MainScreen() {
                   const result = await checkNearby(user.id);
                   if (result && result.data && result.data.matched_user) {
                     // Navigate to /MatchScreen (or /match) and pass matchData as JSON string param
-                    router.push({ pathname: '/MatchScreen', params: { data: JSON.stringify(result.data) } });
+                    router.push({ pathname: '/match-screen', params: { data: JSON.stringify(result.data) } });
                   } else {
-                    setPingStatus('checkNearby completed (no match)');
+                    setPingStatus("Nobody just yet. We'll let you know when someone is nearby!");
                   }
                 } catch (err) {
                   setPingStatus(`checkNearby error: ${typeof err === 'object' && err && 'message' in err ? (err as any).message : String(err)}`);
@@ -146,8 +143,7 @@ export default function MainScreen() {
             ) : null}
           </>
         )}
-      </ThemedView>
-    </PaperProvider>
+    </ThemedView>
   );
 }
 
@@ -157,14 +153,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: 'transparent',
   },
-  welcome: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
+  // Removed welcome style to ensure ThemedText type="title" uses only the font style from themed-text.tsx
   sub: {
     fontSize: 18,
     color: '#e95581',

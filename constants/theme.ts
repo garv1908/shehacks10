@@ -3,7 +3,6 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-import { Platform } from 'react-native';
 
 // Pink palette
 const tintColorLight = '#ff4f9a'; // Vibrant pink
@@ -11,44 +10,30 @@ const tintColorDark = '#ffb6d5'; // Soft pink for dark mode
 
 export const Colors = {
   light: {
-    text: '#e95581', // user-preferred pink
-    background: '#fce4ec', // soft blush pink
-    tint: '#f48fb1', // soft highlight pink
-    icon: '#f06292', // accent pink
-    tabIconDefault: '#f8bbd0', // muted pink for inactive
-    tabIconSelected: '#f06292', // accent pink for active
+    text: '#2D0015', // Deep Charcoal/Plum for high contrast text
+    background: '#FFF0F5', // Soft Rose White
+    tint: '#E91E63', // Vibrant Raspberry
+    icon: '#D81B60',
+    tabIconDefault: '#F8BBD0',
+    tabIconSelected: '#E91E63',
+    surface: '#FFFFFF',
+    elevation: '#FCE4EC',
   },
   dark: {
-    text: '#e95581', // user-preferred pink
-    background: '#31102b', // deep muted plum
-    tint: '#f06292', // accent pink
-    icon: '#f48fb1', // soft highlight pink
-    tabIconDefault: '#7c4d64', // muted plum for inactive
-    tabIconSelected: '#f48fb1', // soft highlight pink for active
+    text: '#FCE4EC', // Soft Pink White
+    background: '#2D0015', // Deep Plum
+    tint: '#FF4081', // Hot Pink
+    icon: '#FF80AB',
+    tabIconDefault: '#880E4F',
+    tabIconSelected: '#FF4081',
+    surface: '#4A0E2E',
+    elevation: '#5C123B',
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const Fonts = {
+  sans: 'PlusJakartaSans-Regular',
+  serif: 'Outfit-Regular', // Using Outfit as the "serif" slot for headings effectively
+  rounded: 'PlusJakartaSans-Medium',
+  mono: 'monospace',
+};

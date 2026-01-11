@@ -1,7 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { AppButton } from '@/components/ui/app-button';
+import { Colors, Fonts } from '@/constants/theme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { Card } from 'react-native-paper';
 
 const cuteQuestions = [
@@ -24,40 +25,87 @@ export function getRandomCuteQuestion() {
 export default function MatchScreen() {
   const router = useRouter();
   const { data } = useLocalSearchParams();
+  
+  if (!data) {
+    return (
+        <View style={styles.root}>
+            <ThemedText>Error: No match data provided.</ThemedText>
+            <AppButton onPress={() => router.replace('/')}>Go Home</AppButton>
+        </View>
+    )
+  }
+
   const { matched_user_id, mutual_interest, nearest_place, mutual_meeting_place } = JSON.parse(data as string);
 
   const openMaps = () => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${nearest_place.location.lat},${nearest_place.location.lng}`;
-    Linking.openURL(url);
+    let url = '';
+    if (nearest_place.place_id) {
+        url = `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${nearest_place.place_id}`;
+    } else if (nearest_place.location && nearest_place.location.lat && nearest_place.location.lng) {
+        url = `https://www.google.com/maps/search/?api=1&query=${nearest_place.location.lat},${nearest_place.location.lng}`;
+    } else {
+        // Fallback for demo data or simple names
+        url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nearest_place.name + ' ' + (nearest_place.address || ''))}`;
+    }
+    if (url) Linking.openURL(url);
   };
   const question = getRandomCuteQuestion();
+
   return (
     <View style={styles.root}>
-      <Card style={styles.card}>
-        <Card.Title
-          title={<ThemedText style={styles.matchTitle}>🎉 It's a Match!</ThemedText>}
-        />
-        <Card.Content>
-          <ThemedText type="subtitle" style={styles.section}>Meet at:</ThemedText>
-          <ThemedText style={styles.place}>{nearest_place.name}</ThemedText>
-          <ThemedText style={styles.address}>{nearest_place.address}</ThemedText>
-          <ThemedText type="subtitle" style={styles.section}>Mutual Interests</ThemedText>
-          <View style={styles.chipRow}>
-            {mutual_interest.map((interest: string) => (
-              <View key={interest} style={styles.chip}><ThemedText>{interest}</ThemedText></View>
-            ))}
-          </View>
-          <ThemedText type="subtitle" style={styles.section}>Mutual Meeting Places</ThemedText>
-          <View style={styles.chipRow}>
-              <View key={mutual_meeting_place} style={styles.chip}><ThemedText>{mutual_meeting_place}</ThemedText></View>
-          </View>
-          <ThemedText style={styles.cuteQ}>{question}</ThemedText>
-        </Card.Content>
-        <Card.Actions style={styles.actions}>
-          <AppButton onPress={openMaps} style={styles.button}>Open in Google Maps</AppButton>
-          <AppButton mode="outlined" onPress={() => router.replace('/')} style={styles.button}>Back</AppButton>
-        </Card.Actions>
-      </Card>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            {/* Header Section */}
+            <View style={styles.header}>
+                <ThemedText style={styles.emoji}>✨💕✨</ThemedText>
+                <ThemedText style={styles.matchTitle}>It's a Match!</ThemedText>
+                <ThemedText style={styles.subtitle}>You found someone with great taste.</ThemedText>
+            </View>
+
+            {/* Main Card */}
+            <Card style={styles.card}>
+                <Card.Content style={styles.cardContent}>
+                    {/* Location Section */}
+                    <View style={styles.sectionContainer}>
+                        <ThemedText style={styles.sectionLabel}>MEET AT</ThemedText>
+                        <ThemedText style={styles.placeName}>{nearest_place.name}</ThemedText>
+                        <ThemedText style={styles.address}>{nearest_place.address}</ThemedText>
+                    </View>
+
+                    <View style={styles.divider} />
+
+                    {/* Interests Section */}
+                    <View style={styles.sectionContainer}>
+                        <ThemedText style={styles.sectionLabel}>YOU BOTH LIKE</ThemedText>
+                        <View style={styles.chipRow}>
+                            {mutual_interest.map((interest: string) => (
+                            <View key={interest} style={styles.chip}>
+                                <ThemedText style={styles.chipText}>{interest}</ThemedText>
+                            </View>
+                            ))}
+                        </View>
+                    </View>
+
+                     <View style={styles.divider} />
+
+                    {/* Icebreaker Section */}
+                    <View style={styles.icebreakerContainer}>
+                        <ThemedText style={styles.icebreakerLabel}>ICEBREAKER</ThemedText>
+                        <ThemedText style={styles.icebreakerText}>"{question}"</ThemedText>
+                    </View>
+
+                </Card.Content>
+            </Card>
+
+            {/* Actions */}
+            <View style={styles.actions}>
+                <AppButton onPress={openMaps} style={styles.primaryButton} labelStyle={{ fontSize: 18 }}>
+                    Open in Maps 📍
+                </AppButton>
+                <AppButton mode="text" onPress={() => router.replace('/')} style={styles.secondaryButton}>
+                    Maybe Later
+                </AppButton>
+            </View>
+      </ScrollView>
     </View>
   );
 }
@@ -65,70 +113,138 @@ export default function MatchScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: Colors.light.background,
+  },
+  scrollContent: {
     padding: 24,
+    paddingTop: 60,
+    alignItems: 'center',
+    paddingBottom: 40,
+  },
+  header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  },
+  emoji: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  matchTitle: {
+    fontFamily: Fonts.serif, // Outfit
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: Colors.light.tint,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontFamily: Fonts.sans,
+    fontSize: 18,
+    color: Colors.light.text,
+    opacity: 0.7,
+    textAlign: 'center',
   },
   card: {
     width: '100%',
-    maxWidth: 400,
-    borderRadius: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 8,
-    elevation: 6,
+    borderRadius: 32,
+    elevation: 8,
+    backgroundColor: Colors.light.surface,
+    marginBottom: 24,
+    shadowColor: Colors.light.tint,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
   },
-  matchTitle: {
+  cardContent: {
+    padding: 24,
+  },
+  sectionContainer: {
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  sectionLabel: {
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    color: Colors.light.text,
+    opacity: 0.5,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  placeName: {
+    fontFamily: Fonts.serif, // Outfit
     fontSize: 28,
     fontWeight: 'bold',
+    color: Colors.light.text,
     textAlign: 'center',
-    color: '#e95581',
     marginBottom: 4,
-  },
-  section: {
-    marginTop: 12,
-    marginBottom: 4,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  place: {
-    fontSize: 20,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 2,
   },
   address: {
-    fontSize: 14,
+    fontFamily: Fonts.sans,
+    fontSize: 15,
+    color: Colors.light.text,
+    opacity: 0.7,
     textAlign: 'center',
-    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.light.text,
+    opacity: 0.1,
+    marginVertical: 20,
+    width: '80%',
+    alignSelf: 'center',
   },
   chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginBottom: 8,
+    gap: 8,
   },
   chip: {
-    backgroundColor: '#f8bbd0',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    margin: 4,
+    backgroundColor: Colors.light.elevation, // Soft pink bg
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  cuteQ: {
-    marginTop: 18,
+  chipText: {
+    fontFamily: Fonts.sans,
+    fontWeight: '600',
+    color: Colors.light.tint,
+    fontSize: 14,
+  },
+  icebreakerContainer: {
+    backgroundColor: Colors.light.background,
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  icebreakerLabel: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: Colors.light.tint,
+    marginBottom: 6,
+    letterSpacing: 1,
+  },
+  icebreakerText: {
+    fontFamily: Fonts.serif,
     fontStyle: 'italic',
-    fontSize: 16,
+    fontSize: 18,
+    color: Colors.light.text,
     textAlign: 'center',
-    color: '#e95581',
+    lineHeight: 24,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    marginHorizontal: 8,
+    width: '100%',
+    gap: 12,
   },
-  button: {
-    flex: 1,
-    marginHorizontal: 4,
+  primaryButton: {
+    width: '100%',
+    height: 56,
+  },
+  secondaryButton: {
+    width: '100%',
   },
 });
