@@ -62,44 +62,47 @@ export default function MatchScreen() {
             </View>
 
             {/* Main Card */}
+            
             <Card style={styles.card}>
-                <Card.Content style={styles.cardContent}>
-                    {/* Location Section */}
-                    <View style={styles.sectionContainer}>
-                        <ThemedText style={styles.sectionLabel}>MEET AT</ThemedText>
-                        <ThemedText style={styles.placeName}>{nearest_place.name}</ThemedText>
-                        <ThemedText style={styles.address}>{nearest_place.address}</ThemedText>
-                    </View>
-                    <View style={styles.chipRow}>
-                                  <View key={distance} style={styles.chip}>
-                                    <ThemedText>{distance.label}</ThemedText>
-                                    <ThemedText>{distance.time} minute away</ThemedText>
-                                    </View>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    {/* Interests Section */}
-                    <View style={styles.sectionContainer}>
-                        <ThemedText style={styles.sectionLabel}>YOU BOTH LIKE</ThemedText>
-                        <View style={styles.chipRow}>
-                            {mutual_interest.map((interest: string) => (
-                            <View key={interest} style={styles.chip}>
-                                <ThemedText style={styles.chipText}>{interest}</ThemedText>
-                            </View>
-                            ))}
-                        </View>
-                    </View>
-
-                     <View style={styles.divider} />
-
-                    {/* Icebreaker Section */}
-                    <View style={styles.icebreakerContainer}>
-                        <ThemedText style={styles.icebreakerLabel}>ICEBREAKER</ThemedText>
-                        <ThemedText style={styles.icebreakerText}>"{question}"</ThemedText>
-                    </View>
-
-                </Card.Content>
+              <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                  <Card.Content style={styles.cardContent}>
+                      {/* Location Section */}
+                      <View style={styles.sectionContainer}>
+                          <ThemedText style={styles.sectionLabel}>MEET AT</ThemedText>
+                          <ThemedText style={styles.placeName}>{nearest_place.name}</ThemedText>
+                          <ThemedText style={styles.address}>{nearest_place.address}</ThemedText>
+                      </View>
+                      <View style={styles.chipRow}>
+                                    <View key={distance} style={styles.chip}>
+                                      <ThemedText>{distance.label}</ThemedText>
+                                      <ThemedText>{distance.time} minute away</ThemedText>
+                                      </View>
+                      </View>
+  
+                      <View style={styles.divider} />
+  
+                      {/* Interests Section */}
+                      <View style={styles.sectionContainer}>
+                          <ThemedText style={styles.sectionLabel}>YOU BOTH LIKE</ThemedText>
+                          <View style={styles.chipRow}>
+                              {mutual_interest.map((interest: string) => (
+                              <View key={interest} style={styles.chip}>
+                                  <ThemedText style={styles.chipText}>{interest}</ThemedText>
+                              </View>
+                              ))}
+                          </View>
+                      </View>
+  
+                       <View style={styles.divider} />
+  
+                      {/* Icebreaker Section */}
+                      <View style={styles.icebreakerContainer}>
+                          <ThemedText style={styles.icebreakerLabel}>ICEBREAKER</ThemedText>
+                          <ThemedText style={styles.icebreakerText}>"{question}"</ThemedText>
+                      </View>
+  
+                  </Card.Content>
+              </ScrollView>
             </Card>
 
             {/* Actions */}
