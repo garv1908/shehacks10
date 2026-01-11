@@ -64,7 +64,7 @@ export default function MatchScreen() {
             {/* Main Card */}
             
             <Card style={styles.card}>
-              <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+              <ScrollView contentContainerStyle={styles.scrollCardContent} showsVerticalScrollIndicator={false}>
                   <Card.Content style={styles.cardContent}>
                       {/* Location Section */}
                       <View style={styles.sectionContainer}>
@@ -127,6 +127,12 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     alignItems: 'center',
     paddingBottom: 40,
+  },
+  scrollCardContent: {
+    padding: 24,
+    paddingTop: 0,
+    alignItems: 'center',
+    paddingBottom: 30,
   },
   header: {
     marginBottom: 32,
