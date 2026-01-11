@@ -1,7 +1,5 @@
-import * as Notifications from 'expo-notifications';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import useLocationUpdater from '../hooks/useLocationUpdater';
-import usePushToken from '../hooks/usePushToken';
 import { getProfileByAuthId, upsertProfileForAuthUser } from '../services/profileService';
 import { supabase } from '../supabaseClient';
 import React from 'react';
@@ -114,23 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Notification listeners for in-app notifications (local notifications)
-  useEffect(() => {
-    const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
-      setLatestNotification(notification);
-    });
-    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
-      setLatestNotification(response.notification ?? null);
-    });
-
-    return () => {
-      receivedListener.remove();
-      responseListener.remove();
-    };
-  }, []);
-
   // wire push token and location updater hooks (they internally early-return if no user)
-  usePushToken(user);
   useLocationUpdater(user);
 
   const clearNotification = () => setLatestNotification(null);
