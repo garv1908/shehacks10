@@ -24,7 +24,7 @@ export function getRandomCuteQuestion() {
 export default function MatchScreen() {
   const router = useRouter();
   const { data } = useLocalSearchParams();
-  const { matched_user_id, mutual_interest, nearest_place, mutual_meeting_place } = JSON.parse(data as string);
+  const { matched_user_id, mutual_interest, nearest_place, mutual_meeting_place, distance } = JSON.parse(data as string);
 
   const openMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${nearest_place.location.lat},${nearest_place.location.lng}`;
@@ -50,6 +50,12 @@ export default function MatchScreen() {
           <ThemedText type="subtitle" style={styles.section}>Mutual Meeting Places</ThemedText>
           <View style={styles.chipRow}>
               <View key={mutual_meeting_place} style={styles.chip}><ThemedText>{mutual_meeting_place}</ThemedText></View>
+          </View>
+          <View style={styles.chipRow}>
+              <View key={distance} style={styles.chip}>
+                <ThemedText>{distance.label}</ThemedText>
+                <ThemedText>{distance.time} away</ThemedText>
+                </View>
           </View>
           <ThemedText style={styles.cuteQ}>{question}</ThemedText>
         </Card.Content>
