@@ -1,10 +1,11 @@
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Paragraph, Text } from 'react-native-paper';
 import { useAuth } from '../providers/AuthProvider';
+import { SUPABASE_ANON_KEY } from '../secrets';
 import { upsertProfileForAuthUser } from '../services/profileService';
 
 export default function Home() {
@@ -13,6 +14,8 @@ export default function Home() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locLoading, setLocLoading] = useState(false);
   const [pingStatus, setPingStatus] = useState<string | null>(null);
+
+  // Manual check button will call the edge function; polling removed.
 
   return (
     <View style={styles.container}>
@@ -62,6 +65,25 @@ export default function Home() {
 
           <View style={{ height: 8 }} />
           <Button mode="outlined" onPress={async () => {
+            if (!user) return;
+            setPingStatus('Calling checkNearby...');
+            try {
+              const { checkNearby } = await import('../services/checkNearbyService');
+              console.log('[app] calling checkNearby for user.id=', user.id);
+              const { data, error } = await checkNearby(user.id);
+              if (error) {
+                console.error('[checkNearby] error', error);
+                setPingStatus(`checkNearby error: ${error.message}`);
+              } else {
+                console.log('[checkNearby] response data', data);
+                setPingStatus('checkNearby: success (see console)');
+              }
+            } catch (err) {
+              console.error('[checkNearby] request failed', err);
+              setPingStatus(`checkNearby error: ${err?.message ?? String(err)}`);
+            }
+          }}>Check Nearby Now</Button>
+          <Button mode="outlined" onPress={async () => {
             console.log('[app] scheduling test notification');
             try {
               const id = await Notifications.scheduleNotificationAsync({ content: { title: 'Test', body: 'Sample in-app notification' }, trigger: null });
@@ -90,6 +112,55 @@ export default function Home() {
     </View>
   );
 }
+
+// Poll the edge function every 30s while this component is mounted.
+// It POSTs the current user's id to the function and logs the response.
+// The interval is cleaned up on unmount.
+const POLL_INTERVAL_MS = 30_000;
+
+function useCheckNearbyPolling(userId?: string | null) {
+  useEffect(() => {
+    if (!userId) return;
+
+    let cancelled = false;
+
+    const callFn = async () => {
+      try {
+        console.log('[checkNearby] calling edge function for user', userId);
+        const res = await fetch('https://mlwaexcuqgskljwtanij.supabase.co/functions/v1/checkNearby', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ current_user_id: userId }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.warn('[checkNearby] non-OK response', res.status, text);
+          return;
+        }
+
+        const data = await res.json();
+        if (!cancelled) console.log('[checkNearby] result', data);
+      } catch (err) {
+        if (!cancelled) console.error('[checkNearby] error', err);
+      }
+    };
+
+    // call immediately, then every POLL_INTERVAL_MS
+    callFn();
+    const id = setInterval(callFn, POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [userId]);
+}
+
+// polling hook defined above; it's invoked from inside the component
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
