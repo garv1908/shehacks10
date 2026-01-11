@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { AppButton } from '@/components/ui/app-button';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Linking, StyleSheet, View } from 'react-native';
 import { Card } from 'react-native-paper';
 
@@ -20,8 +21,11 @@ export function getRandomCuteQuestion() {
   return cuteQuestions[Math.floor(Math.random() * cuteQuestions.length)];
 }
 
-export function MatchScreen({ data, onBack }: { data: any; onBack: () => void }) {
-  const { matched_user, mutual_interest, nearest_place } = data;
+export default function MatchScreen() {
+  const router = useRouter();
+  const { data } = useLocalSearchParams();
+  const { matched_user_id, mutual_interest, nearest_place, mutual_meeting_place } = JSON.parse(data as string);
+
   const openMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${nearest_place.location.lat},${nearest_place.location.lng}`;
     Linking.openURL(url);
@@ -45,15 +49,13 @@ export function MatchScreen({ data, onBack }: { data: any; onBack: () => void })
           </View>
           <ThemedText type="subtitle" style={styles.section}>Mutual Meeting Places</ThemedText>
           <View style={styles.chipRow}>
-            {matched_user.meeting_places.map((place: string) => (
-              <View key={place} style={styles.chip}><ThemedText>{place}</ThemedText></View>
-            ))}
+              <View key={mutual_meeting_place} style={styles.chip}><ThemedText>{mutual_meeting_place}</ThemedText></View>
           </View>
           <ThemedText style={styles.cuteQ}>{question}</ThemedText>
         </Card.Content>
         <Card.Actions style={styles.actions}>
           <AppButton onPress={openMaps} style={styles.button}>Open in Google Maps</AppButton>
-          <AppButton mode="outlined" onPress={onBack} style={styles.button}>Back</AppButton>
+          <AppButton mode="outlined" onPress={() => router.replace('/')} style={styles.button}>Back</AppButton>
         </Card.Actions>
       </Card>
     </View>

@@ -20,6 +20,7 @@ const theme = {
 
 function AppInner(props: any) {
   const { user } = useAuth();
+  if (!user) { throw new Error('User not authenticated in AppInner'); }
   return (
     <>
       <NotificationListener currentUserId={user?.id} />

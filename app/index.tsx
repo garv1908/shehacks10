@@ -1,16 +1,16 @@
 
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { AppButton } from '@/components/ui/app-button';
+import { checkNearby } from '@/services/checkNearbyService';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { AppButton } from '@/components/ui/app-button';
-import { MatchScreen } from '@/screens/main/MatchScreen';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '../providers/AuthProvider';
-import { checkNearby } from '@/services/checkNearbyService';
+import { supabase } from '@/supabaseClient';
 
 
 export default function MainScreen() {
@@ -19,12 +19,47 @@ export default function MainScreen() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [pingStatus, setPingStatus] = useState<string>('');
   const [locLoading, setLocLoading] = useState(false);
-  const [showMatchScreen, setShowMatchScreen] = useState(false);
-  const [matchData, setMatchData] = useState<any>(null); // Replace 'any' with your match data type
+  // const [showMatchScreen, setShowMatchScreen] = useState(false);
+  // const [matchData, setMatchData] = useState<any>(null); // Replace 'any' with your match data type
 
-  if (showMatchScreen && matchData) {
-    return <MatchScreen data={matchData} onBack={() => setShowMatchScreen(false)} />;
-  }
+
+  useEffect(() => {
+    console.log("in use effect")
+    if (!user) {
+      console.error("NotificationListener: No user in MainScreen useEffect");
+      return;
+    };
+    const currentUserId = user.id;
+    console.log("NotificationListener useEffect for user:", currentUserId);
+    if (!currentUserId) {
+      console.log("NotificationListener: No currentUserId provided");
+      return;
+    }
+
+    const channel = supabase
+      .channel('notifications-stream')
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${currentUserId}`,
+        },
+        (payload) => {
+          console.log("New notification for user ", currentUserId, payload);
+          router.push({ pathname: '/MatchScreen', params: { data: JSON.stringify(payload.new.payload) } });
+        }
+      )
+      .subscribe();
+    console.log("NotificationListener: Subscribed to notifications channel");
+
+    // return () => {
+    //   console.log("NotificationListener: Unsubscribing from notifications channel", channel);
+    //   supabase.removeChannel(channel);
+    // };
+  }, [user?.id]);
+
 
   return (
     <PaperProvider>
@@ -37,8 +72,19 @@ export default function MainScreen() {
           </AppButton>
         ) : (
           <>
-            <AppButton inverted onPress={() => { logout(); router.replace('/login'); }}>
-              Logout
+            <AppButton
+              mode="contained"
+              onPress={async () => {
+                if (!user) return;
+                try {
+                  // TODO: upsertProfileForAuthUser logic
+                } catch (err) {
+                  // console.warn('failed to set needs_onboarding on profile', err);
+                }
+                router.push('/onboarding/name');
+              }}
+            >
+              Start Onboarding
             </AppButton>
             <AppButton
               mode="outlined"
@@ -78,16 +124,13 @@ export default function MainScreen() {
                 if (!user) return;
                 setPingStatus('Calling checkNearby...');
                 try {
-                  // Call checkNearby and handle match
-                  checkNearby(user.id)
-                    .then((result) => {
-                      if (result && result.data && result.data.matched_user) {
-                        setMatchData(result.data);
-                        setShowMatchScreen(true);
-                      } else {
-                        setPingStatus('checkNearby completed (no match)');
-                      }
-                    });
+                  const result = await checkNearby(user.id);
+                  if (result && result.data && result.data.matched_user) {
+                    // Navigate to /MatchScreen (or /match) and pass matchData as JSON string param
+                    router.push({ pathname: '/MatchScreen', params: { data: JSON.stringify(result.data) } });
+                  } else {
+                    setPingStatus('checkNearby completed (no match)');
+                  }
                 } catch (err) {
                   setPingStatus(`checkNearby error: ${typeof err === 'object' && err && 'message' in err ? (err as any).message : String(err)}`);
                 }
@@ -95,31 +138,8 @@ export default function MainScreen() {
             >
               Check Nearby Now
             </AppButton>
-            <AppButton
-              mode="outlined"
-              onPress={async () => {
-                try {
-                  await Notifications.scheduleNotificationAsync({ content: { title: 'Test', body: 'Sample in-app notification' }, trigger: null });
-                } catch (err) {
-                  // Silently ignore push notification errors
-                }
-              }}
-            >
-              Send Test Notification
-            </AppButton>
-            <AppButton
-              mode="contained"
-              onPress={async () => {
-                if (!user) return;
-                try {
-                  // TODO: upsertProfileForAuthUser logic
-                } catch (err) {
-                  // console.warn('failed to set needs_onboarding on profile', err);
-                }
-                router.push('/onboarding/name');
-              }}
-            >
-              Start Onboarding
+            <AppButton inverted onPress={() => { logout(); router.replace('/login'); }}>
+              Logout
             </AppButton>
             {location ? (
               <ThemedText style={{ marginTop: 12 }}>Last ping: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}</ThemedText>
