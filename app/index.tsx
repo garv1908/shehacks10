@@ -26,7 +26,7 @@ export default function MainScreen() {
   useEffect(() => {
     console.log("in use effect")
     if (!user) {
-      console.error("NotificationListener: No user in MainScreen useEffect");
+      console.warn("NotificationListener: No user in MainScreen useEffect");
       return;
     };
     const currentUserId = user.id;

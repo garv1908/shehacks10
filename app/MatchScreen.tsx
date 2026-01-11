@@ -54,7 +54,7 @@ export default function MatchScreen() {
           <View style={styles.chipRow}>
               <View key={distance} style={styles.chip}>
                 <ThemedText>{distance.label}</ThemedText>
-                <ThemedText>{distance.time} away</ThemedText>
+                <ThemedText>{distance.time} minute away</ThemedText>
                 </View>
           </View>
           <ThemedText style={styles.cuteQ}>{question}</ThemedText>
