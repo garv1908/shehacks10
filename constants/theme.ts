@@ -5,25 +5,26 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Pink palette
+const tintColorLight = '#ff4f9a'; // Vibrant pink
+const tintColorDark = '#ffb6d5'; // Soft pink for dark mode
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: '#e95581', // user-preferred pink
+    background: '#fce4ec', // soft blush pink
+    tint: '#f48fb1', // soft highlight pink
+    icon: '#f06292', // accent pink
+    tabIconDefault: '#f8bbd0', // muted pink for inactive
+    tabIconSelected: '#f06292', // accent pink for active
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#e95581', // user-preferred pink
+    background: '#31102b', // deep muted plum
+    tint: '#f06292', // accent pink
+    icon: '#f48fb1', // soft highlight pink
+    tabIconDefault: '#7c4d64', // muted plum for inactive
+    tabIconSelected: '#f48fb1', // soft highlight pink for active
   },
 };
 
