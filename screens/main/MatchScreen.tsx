@@ -1,7 +1,6 @@
-import React from 'react';
-import { View, StyleSheet, Linking } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { AppButton } from '@/components/ui/app-button';
+import { Linking, StyleSheet, View } from 'react-native';
 import { Card } from 'react-native-paper';
 
 const cuteQuestions = [
@@ -32,9 +31,7 @@ export function MatchScreen({ data, onBack }: { data: any; onBack: () => void })
     <View style={styles.root}>
       <Card style={styles.card}>
         <Card.Title
-          title={() => (
-            <ThemedText style={styles.matchTitle}>🎉 It's a Match!</ThemedText>
-          )}
+          title={<ThemedText style={styles.matchTitle}>🎉 It's a Match!</ThemedText>}
         />
         <Card.Content>
           <ThemedText type="subtitle" style={styles.section}>Meet at:</ThemedText>
